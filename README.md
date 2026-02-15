@@ -1,47 +1,88 @@
-Halloum97: Create a short but have the important info README for the project
+# Chat App
 
-#codebase 
+A real-time chat application I'm building with React, Firebase, and Vite. The idea is pretty straightforward — sign up, find people, and start chatting. Messages show up instantly, you can share images, and it works on mobile too.
 
-Workspace: # Chat App
+## What it does
 
-This is a simple chat application built with React, Firebase, and Vite.
+- Sign up / log in with email and password
+- Update your profile (name, bio, avatar)
+- Search for other users by username
+- Real-time messaging with text and images
+- See who's online and who isn't
+- Shared media gallery in chat
 
-## Features
+## Tech stack
 
-- User authentication (signup, login, logout)
-- Real-time chat functionality
-- Profile update
-- Media sharing
+- **React 18** with React Router for navigation
+- **Firebase** — Auth, Firestore (database), Storage (file uploads)
+- **Vite** for fast dev builds
+- **React Toastify** for notifications
 
-## Installation
+## Getting started
 
-1. Clone the repository: git clone <repository-url>
-  
-2. Navigate to the project directory: cd chat-app
-  
-3. Install dependencies: npm install
- 
+1. Clone the repo
+   ```
+   git clone <repository-url>
+   cd chat-app
+   ```
 
-## Usage
+2. Install dependencies
+   ```
+   npm install
+   ```
 
-1. Start the development server: npm run dev
-2. Open your browser and navigate to `http://localhost:3000`.
+3. Set up Firebase — create a `.env` file in the root (see `.env.example` for the format):
+   ```
+   VITE_FIREBASE_API_KEY=your_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_domain
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
 
-## Project Structure
+4. Run it
+   ```
+   npm run dev
+   ```
+   Open `http://localhost:5173` in your browser.
 
-- src: Contains the source code
-  - `components/`: Reusable components (ChatBox, LeftSidebar, RightSidebar)
-  - `config/`: Firebase configuration
-  - `context/`: Application context
-  - `pages/`: Application pages (Login, Chat, ProfileUpdate)
-  - `assets/`: Static assets (images, icons)
-  - `App.jsx`: Main application component
-  - `main.jsx`: Entry point of the application
+## Project structure
+
+```
+src/
+├── assets/          # Icons, images
+├── components/
+│   ├── ChatBox/     # Message area — send/receive texts and images
+│   ├── LeftSidebar/ # Contacts list, user search
+│   └── RightSidebar/# Selected user's profile, shared media
+├── config/
+│   └── firebase.js  # Firebase init + auth helpers
+├── context/
+│   └── AppContext.jsx # Global state (user data, chat data, active chat)
+├── lib/
+│   └── upload.js    # Firebase Storage upload helper
+├── pages/
+│   ├── Chat/        # Main chat page (3-column layout)
+│   ├── Login/       # Login & signup form
+│   └── ProfileUpdate/ # Edit name, bio, avatar
+├── App.jsx          # Routes + auth state listener
+└── main.jsx         # Entry point
+```
 
 ## Scripts
 
-- `npm run dev`: Start the development server
-- `npm run build`: Build the project
-- `npm run lint`: Run ESLint
-- `npm run preview`: Preview the production build
+| Command | What it does |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the build locally |
+| `npm run lint` | Run ESLint |
+
+## Deployment
+
+Build the project and deploy the `dist/` folder to Firebase Hosting, Vercel, or Netlify:
+```
+npm run build
+```
 
