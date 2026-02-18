@@ -1,19 +1,20 @@
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { auth, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 
 export const AppContext = createContext();
 
-const AppContextProvider = (props)=>{
+const AppContextProvider = ({ children })=>{
 
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
     const [chatData, setChatData] = useState(null);
     const intervalRef = useRef(null);
 
-    const loadUserData = async(uid)=>{
+    const loadUserData = useCallback(async(uid)=>{
         try {
             const userRef = doc(db, 'users', uid)
             const userSnap = await getDoc(userRef)
@@ -31,7 +32,7 @@ const AppContextProvider = (props)=>{
         } catch (error) {
             toast.error(error.message);
         }
-    }
+    }, [navigate])
 
     // Heartbeat: update lastSeen every 60 seconds while logged in
     useEffect(()=>{
@@ -65,9 +66,13 @@ const AppContextProvider = (props)=>{
 
     return(
         <AppContext.Provider value={value}>
-            {props.children}
+            {children}
         </AppContext.Provider>
     )
 }
+
+AppContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
 
 export default AppContextProvider;
