@@ -1,7 +1,6 @@
 import assets from '../../assets/assets';
 import { logout } from '../../config/firebase';
 import './RightSidebar.css'
-import React from "react";
 
 const RightSidebar =()=>{
   return(

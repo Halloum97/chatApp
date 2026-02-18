@@ -1,6 +1,5 @@
 import assets from '../../assets/assets';
 import './LeftSidebar.css'
-import React from "react";
 
 const LeftSidebar =()=>{
   return(

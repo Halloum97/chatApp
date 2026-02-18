@@ -2,7 +2,6 @@ import ChatBox from '../../components/ChatBox/ChatBox';
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
 import RightSidebar from '../../components/RightSidebar/RightSidebar';
 import './Chat.css'
-import React from "react";
 
 const Chat =()=>{
   return(

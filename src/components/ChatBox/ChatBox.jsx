@@ -1,6 +1,5 @@
 import assets from '../../assets/assets';
 import './ChatBox.css'
-import React from "react";
 
 const ChatBox =()=>{
   return(
