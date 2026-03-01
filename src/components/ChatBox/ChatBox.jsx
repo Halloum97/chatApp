@@ -7,7 +7,7 @@ import { db } from '../../config/firebase';
 import { toast } from 'react-toastify';
 
 const ChatBox =()=>{
-  const { messagesId, chatUser, userData, chatData } = useContext(AppContext);
+  const { messagesId, chatUser, userData } = useContext(AppContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const scrollEnd = useRef(null);

@@ -109,7 +109,8 @@ const LeftSidebar =()=>{
         return c;
       });
       // Rebuild without userData field (only store raw chat entries)
-      const rawChatData = updatedChatData.map(({userData: _u, ...rest}) => rest);
+      // eslint-disable-next-line no-unused-vars
+      const rawChatData = updatedChatData.map(({userData: _unused, ...rest}) => rest);
       await updateDoc(chatRef, { chatData: rawChatData });
     } catch (error) {
       console.error("Failed to update seen status:", error);
