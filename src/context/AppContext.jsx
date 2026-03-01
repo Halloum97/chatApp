@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { auth, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,8 @@ const AppContextProvider = ({ children })=>{
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
     const [chatData, setChatData] = useState(null);
+    const [messagesId, setMessagesId] = useState(null);
+    const [chatUser, setChatUser] = useState(null);
     const intervalRef = useRef(null);
 
     const loadUserData = useCallback(async(uid)=>{
@@ -58,9 +60,42 @@ const AppContextProvider = ({ children })=>{
         }
     },[userData])
 
+    // Real-time chat list listener
+    useEffect(()=>{
+        if(userData){
+            const chatRef = doc(db, 'chats', userData.id);
+            const unsub = onSnapshot(chatRef, async(snapshot)=>{
+                try {
+                    const data = snapshot.data();
+                    if(!data || !data.chatData){
+                        setChatData([]);
+                        return;
+                    }
+                    const items = data.chatData;
+                    const tempData = [];
+                    for(const item of items){
+                        const userRef = doc(db, 'users', item.rId);
+                        const userSnap = await getDoc(userRef);
+                        const receiverData = userSnap.data();
+                        tempData.push({...item, userData: receiverData});
+                    }
+                    tempData.sort((a, b) => b.updatedAt - a.updatedAt);
+                    setChatData(tempData);
+                } catch (error) {
+                    console.error("Failed to load chat data:", error);
+                }
+            });
+            return ()=>{
+                unsub();
+            }
+        }
+    },[userData])
+
     const value = {
         userData, setUserData,
         chatData, setChatData,
+        messagesId, setMessagesId,
+        chatUser, setChatUser,
         loadUserData
     }
 
