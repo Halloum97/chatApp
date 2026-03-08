@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Chat from './pages/Chat/Chat'
@@ -13,6 +13,7 @@ const App =()=>{
 
   const navigate = useNavigate();
   const {loadUserData} = useContext(AppContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(()=>{
     const unSub = onAuthStateChanged(auth, async(user)=>{
@@ -23,11 +24,23 @@ const App =()=>{
       else{
         navigate('/')
       }
+      setLoading(false);
     })
     return ()=>{
       unSub();
     }
   },[loadUserData, navigate])
+
+  if(loading){
+    return(
+      <>
+        <ToastContainer/>
+        <div className="loading-screen">
+          <div className="loading-spinner"></div>
+        </div>
+      </>
+    )
+  }
 
   return(
     <>
