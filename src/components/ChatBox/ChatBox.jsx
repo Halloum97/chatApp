@@ -5,6 +5,7 @@ import { AppContext } from '../../context/AppContext';
 import { arrayUnion, doc, onSnapshot, updateDoc, Timestamp, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { toast } from 'react-toastify';
+import upload from '../../lib/upload';
 
 const ChatBox =()=>{
   const { messagesId, chatUser, userData } = useContext(AppContext);
@@ -80,6 +81,67 @@ const ChatBox =()=>{
     }
   }
 
+  const sendImage = async (e)=>{
+    const file = e.target.files?.[0];
+    if(!file || !messagesId) return;
+
+    // Reset input so the same file can be re-selected
+    e.target.value = '';
+
+    if(file.size > 5 * 1024 * 1024){
+      toast.error("Image must be under 5 MB.");
+      return;
+    }
+
+    try {
+      const imageUrl = await upload(file, `chat_images/${Date.now()}_${file.name}`);
+      if(!imageUrl){
+        throw new Error("Image upload failed.");
+      }
+
+      await updateDoc(doc(db, 'messages', messagesId), {
+        messages: arrayUnion({
+          sId: userData.id,
+          image: imageUrl,
+          text: "",
+          createdAt: Timestamp.now()
+        })
+      });
+
+      const imagePreview = "\ud83d\udcf7 Image";
+
+      // Update current user's chat metadata
+      const myChatRef = doc(db, 'chats', userData.id);
+      const myChatSnap = await getDoc(myChatRef);
+      const myData = myChatSnap.data();
+      if(myData && myData.chatData){
+        const updatedMyChat = myData.chatData.map(chat => {
+          if(chat.messageId === messagesId){
+            return {...chat, lastMessage: imagePreview, updatedAt: Date.now(), messageSeen: true};
+          }
+          return chat;
+        });
+        await updateDoc(myChatRef, { chatData: updatedMyChat });
+      }
+
+      // Update other user's chat metadata
+      const otherChatRef = doc(db, 'chats', chatUser.id);
+      const otherChatSnap = await getDoc(otherChatRef);
+      const otherData = otherChatSnap.data();
+      if(otherData && otherData.chatData){
+        const updatedOtherChat = otherData.chatData.map(chat => {
+          if(chat.messageId === messagesId){
+            return {...chat, lastMessage: imagePreview, updatedAt: Date.now(), messageSeen: false};
+          }
+          return chat;
+        });
+        await updateDoc(otherChatRef, { chatData: updatedOtherChat });
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
   const formatTime = (timestamp)=>{
     if(!timestamp) return '';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -131,7 +193,13 @@ const ChatBox =()=>{
             onChange={(e)=>setInput(e.target.value)}
             onKeyDown={(e)=>{ if(e.key === 'Enter') sendMessage() }}
           />
-          <input type="file" id='image' accept='image/png, image/jpeg' hidden/>
+          <input
+            type="file"
+            id='image'
+            accept='image/png, image/jpeg'
+            hidden
+            onChange={sendImage}
+          />
           <label htmlFor="image">
             <img src={assets.gallery_icon} alt="" />
           </label>
